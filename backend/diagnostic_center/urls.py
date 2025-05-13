@@ -19,9 +19,12 @@ from django.contrib import admin
 from django.urls import path
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from rest_framework_simplejwt.views import TokenObtainPairView
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/token", TokenObtainPairView.s_view(), name="token_obtain_pair"),
 ]
 
 schema_view = get_schema_view(
