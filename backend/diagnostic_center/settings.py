@@ -50,10 +50,10 @@ INSTALLED_APPS = [
     "drf_yasg",
     "corsheaders",
     # Local apps (do dodania później)
-    # "accounts",
-    # "patient",
-    # "doctor",
-    # "laboratory",
+    "accounts",
+    "patient",
+    "doctor",
+    "laboratory",
 ]
 
 MIDDLEWARE = [
