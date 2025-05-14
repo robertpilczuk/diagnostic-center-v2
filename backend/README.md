@@ -1,3 +1,5 @@
+[![Django CI](https://github.com/robertpilczuk/diagnostic-center-v2/actions/workflows/ci.yml/badge.svg)](https://github.com/robertpilczuk/diagnostic-center-v2/actions/workflows/ci.yml)
+
 Diagnostic Center – Backend Setup (Django + DRF)
 
 ✨ Cel
