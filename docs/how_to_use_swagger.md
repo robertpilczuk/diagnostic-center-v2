@@ -94,7 +94,7 @@ Swagger teraz automatycznie będzie dodawał Twój token do każdego zapytania.
 
 ## ✅ Co można testować?
 
-- `GET /me/` → dane zalogowanego użytkownika (jeśli taki endpoint istnieje)
+- `GET /me/` → dane zalogowanego użytkownika
 - `GET`, `POST`, `PUT`, `DELETE` do zasobów (np. pacjenci, lekarze, testy)
 - `POST /api/token/refresh/` – odświeżenie tokena
 
