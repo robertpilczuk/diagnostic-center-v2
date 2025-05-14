@@ -52,14 +52,3 @@ urlpatterns += [
         name="schema-json",
     ),
 ]
-
-swagger_settings = {
-    "SECURITY_DEFINITIONS": {
-        "Bearer": {
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "heder",
-            "description": "Dodaj prefix 'Bearer' i token JWT: **Bearer <token>**",
-        }
-    },
-}
