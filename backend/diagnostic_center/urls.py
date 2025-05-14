@@ -21,11 +21,13 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import permissions
+from django.urls import include
 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/token", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/", include("accounts.urls")),
 ]
 
 schema_view = get_schema_view(
