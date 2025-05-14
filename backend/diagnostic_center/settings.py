@@ -156,6 +156,12 @@ REST_FRAMEWORK = {
 
 SWAGGER_SETTINGS = {
     "SECURITY_DEFINITIONS": {
-        "Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"}
-    }
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": "Wprowadź JWT w formacie: **Bearer <token>**",
+        }
+    },
+    "USE_SESSION_AUTH": False,
 }
