@@ -1,44 +1,62 @@
-# CI/CD pipeline dla Diagnostic Center
-# Uruchamia się przy każdym pushu lub PR na main/develop
-# Weryfikuje poprawność kodu backendu (Django)
-
 name: Django CI
 
-on: 
-    push:
-        branches: [ main, develop]
-    pull_request:
-        branches: [main, develop]
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-    backend:
-        name: Run Django checks
-        runs-on: ubuntu-latest
-        
-        steps:
-            - name: Checkout repo
-              uses: actions/checkout@v3
-      
-            - name: Set up Python
-              uses: actions/setup-python@v4
-              with:
-                python-version: "3.12"
-      
-            - name: Install dependencies
-              run: |
-                cd backend
-                python -m venv venv
-                source venv/bin/activate
-                pip install -r requirements.txt
-      
-            - name: Django check
-              run: |
-                cd backend
-                source venv/bin/activate
-                python manage.py check
-      
-            - name: Django migrate
-              run: |
-                cd backend
-                source venv/bin/activate
-                python manage.py migrate --noinput
+  backend-check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      DEBUG: ${{ secrets.DEBUG }}
+      POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_HOST: localhost
+      ACCESS_TOKEN_LIFETIME: ${{ secrets.ACCESS_TOKEN_LIFETIME }}
+      REFRESH_TOKEN_LIFETIME: ${{ secrets.REFRESH_TOKEN_LIFETIME }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run checks
+        run: |
+          source venv/bin/activate
+          python manage.py makemigrations --check --dry-run
+          python manage.py migrate
+          python manage.py check
