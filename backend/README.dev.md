@@ -91,3 +91,14 @@ Zobacz plik `api_spec.md`. Znajdziesz tam:
 ## ✅ Gotowe do pracy
 
 Możesz rozpocząć implementację od razu. Masz gotowe środowisko, strukturę i plan działania.
+
+### 🔐 Kodowanie plików
+
+Aby uniknąć błędów z kodowaniem (np. `UnicodeDecodeError` w Django), upewnij się że:
+
+- Wszystkie pliki zapisane są jako UTF-8 (without BOM)
+- Edytujesz pliki tylko w VS Code lub innym edytorze wspierającym `.editorconfig`
+- Masz ustawione w VS Code (CTRL + Shift + P wpisz Preferences: Open Settings (JSON)):
+  ```json
+  "files.encoding": "utf8",
+  "files.autoGuessEncoding": false
