@@ -1,10 +1,8 @@
-# Python
+# 🐍 Python
 __pycache__/
 *.py[cod]
 *.sqlite3
 *.log
-venv/
-env/
 
 # Django
 *.pot
@@ -12,19 +10,39 @@ env/
 db.sqlite3
 staticfiles/
 media/
+venv/
+env/
+backend/.env
 
-# React
+# ⚛️ React / Vite
 frontend/node_modules/
 frontend/build/
+frontend/dist/
 frontend/.env
+dist/
+dist-ssr/
+*.local
 
-# OS/macOS
+# 🛠️ Node.js / debug logi
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+logs/
+
+# 🧠 IDE / edytory
+.vscode/
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# 💻 OS/macOS
 .DS_Store
 Thumbs.db
-
-# VS Code / JetBrains
-.vscode/
-.idea/
-
-# Env files
-backend/.env
