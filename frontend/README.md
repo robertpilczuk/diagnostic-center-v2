@@ -1,6 +1,6 @@
-# 🖥️ Diagnostic Center – Frontend (React)
+# 🖥️ Diagnostic Center – Frontend (React + Vite + TypeScript)
 
-Ten projekt zawiera frontend aplikacji Diagnostic Center, stworzony w React. Pozwala użytkownikom na interakcję z systemem: rejestrację, logowanie, przeglądanie badań, wizyt, recept i wyników.
+Ten projekt zawiera frontend aplikacji Diagnostic Center, stworzony w React + TypeScript z użyciem Vite. Pozwala użytkownikom na interakcję z systemem: rejestrację, logowanie, przeglądanie badań, wizyt, recept i wyników.
 
 ---
 
@@ -10,12 +10,12 @@ Ten projekt zawiera frontend aplikacji Diagnostic Center, stworzony w React. Poz
 frontend/
 ├── public/
 ├── src/
-│   ├── api/            # integracja z backendem (np. apiClient.js)
+│   ├── api/            # integracja z backendem (np. apiClient.ts)
 │   ├── components/     # komponenty wspólne (np. Navbar, Loader)
-│   ├── context/        # AuthContext – przechowywanie tokenów JWT
-│   ├── pages/          # widoki stron (np. LoginPage, HomePage)
-│   ├── App.js
-│   └── index.js
+│   ├── contexts/       # AuthContext – przechowywanie tokenów JWT
+│   ├── pages/          # widoki stron (np. LoginPage, Dashboard)
+│   ├── App.tsx
+│   └── main.tsx
 ├── .env
 ├── package.json
 └── README.md
@@ -27,13 +27,13 @@ frontend/
 
 ### 1. Wejdź do folderu `frontend/`
 
-```
+```bash
 cd frontend
 ```
 
 ### 2. Zainstaluj zależności
 
-```
+```bash
 npm install
 ```
 
@@ -42,25 +42,25 @@ npm install
 Utwórz plik `.env` i dodaj adres backendu:
 
 ```
-REACT_APP_API_URL=http://localhost:8000
+VITE_API_BASE_URL=http://localhost:8000/api
 ```
 
-> ✅ UWAGA: Prefix `REACT_APP_` jest obowiązkowy w Create React App.
+> ✅ W Vite wszystkie zmienne środowiskowe muszą mieć prefix `VITE_`.
 
 ### 4. Uruchom aplikację
 
-```
-npm start
+```bash
+npm run dev
 ```
 
-Aplikacja będzie dostępna pod adresem `http://localhost:3000`.
+Aplikacja będzie dostępna pod adresem `http://localhost:5173`.
 
 ---
 
 ## 🔐 Autoryzacja JWT
 
-* Po zalogowaniu otrzymujemy token JWT.
-* Token jest zapisywany w `localStorage` i dodawany automatycznie w nagłówkach zapytań.
+* Po zalogowaniu otrzymujemy token JWT z backendu.
+* Token jest zapisywany w `localStorage` i automatycznie dołączany do zapytań HTTP.
 * Wylogowanie usuwa token z pamięci.
 
 ---
@@ -69,7 +69,7 @@ Aplikacja będzie dostępna pod adresem `http://localhost:3000`.
 
 * Node.js 18+
 * npm
-* połączenie z backendem (domyślnie `http://localhost:8000`)
+* Backend Django (domyślnie dostępny pod `http://localhost:8000`)
 
 ---
 
@@ -81,25 +81,44 @@ Dostępna pod adresem:
 http://localhost:8000/swagger/
 ```
 
-Zawiera pełną specyfikację endpointów REST API.
+Zawiera pełną specyfikację endpointów REST API (generowaną automatycznie).
 
 ---
 
 ## 🧪 Testowanie
 
-Na ten moment testy nie są zaimplementowane.
+Na ten moment testy frontendowe nie są zaimplementowane.
 
 ---
 
 ## 🔗 Przydatne komendy
 
-* `npm run start` – uruchomienie aplikacji
-* `npm run build` – produkcyjny build aplikacji
+| Komenda            | Opis                           |
+|--------------------|--------------------------------|
+| `npm run dev`      | uruchomienie aplikacji (dev)   |
+| `npm run build`    | build produkcyjny              |
+| `npm run preview`  | podgląd buildu lokalnie        |
 
 ---
 
 ## 🤝 Współpraca
 
-* Korzystaj z feature branches.
+* Pracuj na `feature/*` branchach.
 * Twórz Pull Requesty z opisem zmian.
-* Review i merge tylko po akceptacji (branch protection).
+* Merge po akceptacji i review (branch protection włączony).
+
+---
+
+## 🧩 Stack technologiczny
+
+- React 18 + TypeScript
+- Vite
+- Axios
+- React Router DOM
+- JWT Auth
+
+---
+
+## 🧠 Uwagi
+
+W projekcie korzystamy z tokenów JWT generowanych przez backend Django. Token jest przekazywany jako nagłówek `Authorization: Bearer <token>` przy każdym żądaniu API.
