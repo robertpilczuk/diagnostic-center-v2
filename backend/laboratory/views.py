@@ -1,5 +1,5 @@
 ﻿from rest_framework.generics import ListAPIView
-from .models import LabTest
+from .models import LabTest,Laboratory
 from .serializers import LabTestSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -13,7 +13,8 @@ from .serializers import (
     SampleSerializer,
     TestResultSerializer
 )
-
+from .serializers import LaboratoryAdminSerializer
+from rest_framework.permissions import IsAdminUser
 
 class LabTestListView(ListAPIView):
     queryset = LabTest.objects.all()
@@ -80,3 +81,23 @@ class TestResultDownloadView(APIView):
             raise Http404("Plik PDF nie istnieje na serwerze.")
 
         return FileResponse(open(file_path, 'rb'), content_type='application/pdf')
+
+
+
+class LaboratoryListForVerificationView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        labs = Laboratory.objects.filter(is_verified=False)
+        serializer = LaboratoryAdminSerializer(labs, many=True)
+        return Response(serializer.data)
+
+
+class LaboratoryVerifyView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def patch(self, request, id):
+        lab = get_object_or_404(Laboratory, id=id)
+        lab.is_verified = True
+        lab.save()
+        return Response({"status": "verified"}, status=status.HTTP_200_OK)

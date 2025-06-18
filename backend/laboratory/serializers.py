@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import LabTest
+from .models import LabTest, Laboratory
 from laboratory.models import Sample, TestResult
 from patient.models import AppointmentRequest
 
@@ -28,3 +28,10 @@ class TestResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = TestResult
         fields = ['test_request', 'test_name', 'result']
+
+
+
+class LaboratoryAdminSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Laboratory
+        fields = ['id', 'name', 'address', 'is_verified']

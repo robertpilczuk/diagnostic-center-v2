@@ -3,6 +3,8 @@ from doctor.models import TestOrder
 
 class Laboratory(models.Model):
     name = models.CharField(max_length=100)
+    is_verified = models.BooleanField(default=False)
+
 
 class LabTest(models.Model):
     name = models.CharField(max_length=100)
