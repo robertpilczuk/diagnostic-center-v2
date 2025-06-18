@@ -1,7 +1,64 @@
 ﻿from rest_framework.generics import ListAPIView
 from .models import LabTest
 from .serializers import LabTestSerializer
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+from laboratory.models import Sample, TestResult
+from patient.models import AppointmentRequest, Patient
+from .serializers import (
+    AppointmentRequestSerializer,
+    AppointmentStatusUpdateSerializer,
+    SampleSerializer,
+    TestResultSerializer
+)
+
 
 class LabTestListView(ListAPIView):
     queryset = LabTest.objects.all()
     serializer_class = LabTestSerializer
+
+
+class AppointmentRequestListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        appointments = AppointmentRequest.objects.filter(laboratory__user=request.user)
+        serializer = AppointmentRequestSerializer(appointments, many=True)
+        return Response(serializer.data)
+
+class AppointmentRequestUpdateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, id):
+        try:
+            appointment = AppointmentRequest.objects.get(id=id)
+        except AppointmentRequest.DoesNotExist:
+            return Response({"error": "Not found"}, status=404)
+
+        serializer = AppointmentStatusUpdateSerializer(appointment, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Status updated"})
+        return Response(serializer.errors, status=400)
+
+class SampleCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = SampleSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Sample registered"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class TestResultCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = TestResultSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Test result added"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
