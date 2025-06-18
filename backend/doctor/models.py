@@ -1,5 +1,6 @@
 ﻿from django.db import models
 from accounts.models import User
+from patient.models import Patient
 
 class Doctor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -7,3 +8,15 @@ class Doctor(models.Model):
 
     def __str__(self):
         return f"Dr. {self.user.username}"
+
+class Prescription(models.Model):
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    medication = models.CharField(max_length=255)
+    issued_at = models.DateTimeField(auto_now_add=True)
+
+class TestOrder(models.Model):
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    test_name = models.CharField(max_length=255)
+    ordered_at = models.DateTimeField(auto_now_add=True)
