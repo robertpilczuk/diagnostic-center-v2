@@ -25,6 +25,8 @@ urlpatterns = [
     path("api/", include("accounts.urls")),
     path('api/', include('laboratory.urls')),
     path("api/", include("patient.urls")),
+    path("api/", include("doctor.urls")),
+
 
 
     # Swagger UI
