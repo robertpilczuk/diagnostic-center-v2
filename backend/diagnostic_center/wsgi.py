@@ -1,4 +1,4 @@
-"""
+﻿"""
 WSGI config for diagnostic_center project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
