@@ -16,3 +16,4 @@ class TestResult(models.Model):
     sample = models.ForeignKey(Sample, on_delete=models.CASCADE)
     result_data = models.TextField()
     result_date = models.DateTimeField(auto_now_add=True)
+    pdf = models.FileField(upload_to='results/', null=True, blank=True)

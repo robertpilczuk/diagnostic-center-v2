@@ -62,3 +62,21 @@ class TestResultCreateView(APIView):
             serializer.save()
             return Response({"message": "Test result added"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class TestResultDownloadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, id):
+        try:
+            result = TestResult.objects.get(id=id)
+        except TestResult.DoesNotExist:
+            raise Http404("Wynik nie istnieje.")
+
+        if not result.pdf_file:  # lub `result.file`, zależnie od nazwy pola
+            raise Http404("Plik PDF nie został wygenerowany.")
+
+        file_path = result.pdf_file.path  # Zakładamy, że masz `FileField` lub `PDFField` w modelu
+        if not os.path.exists(file_path):
+            raise Http404("Plik PDF nie istnieje na serwerze.")
+
+        return FileResponse(open(file_path, 'rb'), content_type='application/pdf')

@@ -7,6 +7,7 @@ from .views import (
     SampleCreateView,
     TestResultCreateView
 )
+from .views import TestResultDownloadView
 
 
 urlpatterns = [
@@ -15,4 +16,6 @@ urlpatterns = [
     path("appointment-requests/<int:id>/", AppointmentRequestUpdateView.as_view(), name="appointment-update"),
     path("samples/", SampleCreateView.as_view(), name="sample-create"),
     path("test-results/", TestResultCreateView.as_view(), name="test-result-create"),
+    path('api/test-results/<int:id>/download/', TestResultDownloadView.as_view()),
+
 ]

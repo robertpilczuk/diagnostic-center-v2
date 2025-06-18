@@ -11,6 +11,7 @@ from laboratory.models import TestResult
 from patient.models import Patient
 from django.db.models import Q
 from rest_framework import status
+import os
 
 class PatientSearchView(APIView):
     permission_classes = [IsAuthenticated]
@@ -51,3 +52,21 @@ class TestOrderResultView(APIView):
         results = TestResult.objects.filter(sample__test_order__id=id)
         serializer = TestResultSerializer(results, many=True)
         return Response(serializer.data)
+
+
+class TestResultDownloadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, id):
+        try:
+            test_result = TestResult.objects.get(id=id)
+        except TestResult.DoesNotExist:
+            raise Http404("Wynik nie istnieje.")
+
+        # Ścieżka do pliku PDF — zakładamy, że masz pole file/pdf_path:
+        file_path = test_result.pdf.path  # np. models.FileField(upload_to='results/')
+
+        if not os.path.exists(file_path):
+            raise Http404("Plik nie istnieje.")
+
+        return FileResponse(open(file_path, 'rb'), content_type='application/pdf')
