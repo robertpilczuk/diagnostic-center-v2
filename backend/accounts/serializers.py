@@ -30,22 +30,33 @@ class RegisterSerializer(serializers.Serializer):
 
         specialization = validated_data.pop('specialization', None)
 
+        # Dane użytkownika
+        username = validated_data.pop('username')
+        email = validated_data.pop('email')
+
+        # Tworzenie użytkownika
         user = User.objects.create_user(
-            username=validated_data['username'],
-            email=validated_data['email'],
+            username=username,
+            email=email,
             password=password
         )
 
         # Ustawiamy typ użytkownika
         if user_type == 'is_patient':
             user.is_patient = True
-            Patient.objects.create(user=user, **validated_data)
+            Patient.objects.create(
+                user=user,
+                pesel=validated_data['pesel'],
+                date_of_birth=validated_data['date_of_birth'],
+                address=validated_data['address'],
+                phone_number=validated_data['phone_number']
+            )
         elif user_type == 'is_doctor':
             user.is_doctor = True
             Doctor.objects.create(user=user, specialty=specialization)
         elif user_type == 'is_laboratory':
             user.is_laboratory = True
-            Laboratory.objects.create(name=validated_data['username'])
+            Laboratory.objects.create(name=username)
 
         user.save()
         return user
