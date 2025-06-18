@@ -1,3 +1,7 @@
-﻿from django.shortcuts import render
+﻿from rest_framework.generics import ListAPIView
+from .models import LabTest
+from .serializers import LabTestSerializer
 
-# Create your views here.
+class LabTestListView(ListAPIView):
+    queryset = LabTest.objects.all()
+    serializer_class = LabTestSerializer
