@@ -24,6 +24,7 @@ urlpatterns = [
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/", include("accounts.urls")),
     path('api/', include('laboratory.urls')),
+    path("api/", include("patient.urls")),
 
 
     # Swagger UI
