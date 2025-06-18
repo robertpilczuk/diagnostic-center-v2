@@ -12,6 +12,9 @@ from patient.models import Patient
 from django.db.models import Q
 from rest_framework import status
 import os
+from .serializers import DoctorAdminSerializer
+from .models import Doctor
+from rest_framework.permissions import IsAdminUser
 
 class PatientSearchView(APIView):
     permission_classes = [IsAuthenticated]
@@ -70,3 +73,22 @@ class TestResultDownloadView(APIView):
             raise Http404("Plik nie istnieje.")
 
         return FileResponse(open(file_path, 'rb'), content_type='application/pdf')
+
+
+
+class DoctorListForVerificationView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        doctors = Doctor.objects.filter(is_verified=False)
+        serializer = DoctorAdminSerializer(doctors, many=True)
+        return Response(serializer.data)
+
+class DoctorVerifyView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def patch(self, request, id):
+        doctor = get_object_or_404(Doctor, id=id)
+        doctor.is_verified = True
+        doctor.save()
+        return Response({"status": "verified"}, status=status.HTTP_200_OK)
