@@ -13,7 +13,7 @@ class User(AbstractUser):
         Group,
         related_name="custom_user_set",
         blank=True,
-        verbose_name="groups",
+        verbose_name="groups", 
         help_text="The groups this user belongs to.",
     )
 
