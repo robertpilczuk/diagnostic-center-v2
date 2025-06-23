@@ -7,6 +7,7 @@ import RoleRouter from "./pages/RoleRouter";
 import DoctorLayout from "./pages/DoctorLayout";
 import LabLayout from "./pages/LabLayout";
 import PatientLayout from "./pages/PatientLayout";
+import RegisterPage from "./pages/RegistrationPage";
 
 import type { ReactElement } from "react";
 
@@ -20,6 +21,7 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route
             path="/"
