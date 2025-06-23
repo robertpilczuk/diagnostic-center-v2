@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import backgroundImage from "../assets/login_bg.png"
 
 const LoginPage = () => {
     const [username, setUsername] = useState("");
@@ -25,34 +26,66 @@ const LoginPage = () => {
     };
 
     return (
-        <div>
-            <h1>Login</h1>
-            {error && <p style={{ color: "red" }}>{error}</p>}
+        <div
+            className="w-screen h-screen flex items-center justify-center bg-cover bg-center"
+            style={{ backgroundImage: `url(${backgroundImage})` }}
+        >
+            <div className="w-full max-w-[438px] bg-white/45 backdrop-blur-[25px] rounded-[25px] shadow-xl px-8 py-6 flex flex-col items-center space-y-4">
+                <h1 className="text-[45px] font-bold text-[#0088CC]">Login</h1>
 
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Username:</label>
-                    <input
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        required
-                    />
+                <input
+                    type="text"
+                    placeholder="Email or Phone*"
+                    className="w-full bg-white/30 rounded-[15px] px-4 py-2 placeholder:text-[#423F32]/80 text-[#423F32] text-[14px] focus:outline-none"
+                />
+
+                <input
+                    type="password"
+                    placeholder="Password*"
+                    className="w-full bg-white/30 rounded-[15px] px-4 py-2 placeholder:text-[#423F32]/80 text-[#423F32] text-[14px] focus:outline-none"
+                />
+
+                <div className="w-full text-right">
+                    <a href="#" className="text-[14.1px] text-[#8E0871] underline">
+                        Forgot password
+                    </a>
                 </div>
 
-                <div>
-                    <label>Password:</label>
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
+                <button className="w-full bg-[#0088CC]/80 text-white font-bold text-[18.9px] py-2 rounded-[15px]">
+                    Log In
+                </button>
+
+                <div className="text-[14.1px] text-[#423F32]">
+                    Don’t have an account?{" "}
+                    <a href="#" className="underline text-[#8E0871]">
+                        Register here
+                    </a>
                 </div>
 
-                <button type="submit">Log in</button>
-            </form>
+                {/* Linie + OR */}
+                <div className="flex items-center w-full gap-4 my-2">
+                    <hr className="flex-grow border-t border-black" />
+                    <span className="text-[15px] text-black">OR</span>
+                    <hr className="flex-grow border-t border-black" />
+                </div>
+
+                {/* Ikony logowania społecznościowego */}
+                <div className="flex justify-center gap-6">
+                    {/* Tutaj później SVG lub <Icon /> */}
+                    <div className="bg-white/50 rounded-[15px] p-2 w-10 h-10 flex items-center justify-center">
+                        G
+                    </div>
+                    <div className="bg-white/50 rounded-[15px] p-2 w-10 h-10 flex items-center justify-center">
+                        f
+                    </div>
+                    <div className="bg-white/50 rounded-[15px] p-2 w-10 h-10 flex items-center justify-center">
+                        
+                    </div>
+                </div>
+            </div>
         </div>
-    )
-};
+    );
+
+}
 
 export default LoginPage;
