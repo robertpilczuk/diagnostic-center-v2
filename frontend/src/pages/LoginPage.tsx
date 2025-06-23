@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext.tsx";
 import backgroundImage from "../assets/login_bg.png"
 
 const LoginPage = () => {
@@ -9,7 +9,8 @@ const LoginPage = () => {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
 
-    const { login } = useAuth();
+    const auth = useAuth();
+    console.log("Auth context:", auth);
     const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -17,8 +18,8 @@ const LoginPage = () => {
 
         try {
             const response = await axios.post("api/token/", { username, password });
-            const token = response.data.access;
-            login(token);
+            const { access, refresh } = response.data;
+            auth.login(access, refresh);
             navigate("/dashboard");
         } catch (err) {
             setError("Invalid credentials");
@@ -36,12 +37,17 @@ const LoginPage = () => {
                 <input
                     type="text"
                     placeholder="Email or Phone*"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     className="w-full bg-white/30 rounded-[15px] px-4 py-2 placeholder:text-[#423F32]/80 text-[#423F32] text-[14px] focus:outline-none"
                 />
+
 
                 <input
                     type="password"
                     placeholder="Password*"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     className="w-full bg-white/30 rounded-[15px] px-4 py-2 placeholder:text-[#423F32]/80 text-[#423F32] text-[14px] focus:outline-none"
                 />
 
@@ -51,7 +57,10 @@ const LoginPage = () => {
                     </a>
                 </div>
 
-                <button className="w-full bg-[#0088CC]/80 text-white font-bold text-[18.9px] py-2 rounded-[15px]">
+                <button
+                    onClick={handleSubmit}
+                    className="w-full bg-[#0088CC]/80 text-white font-bold text-[18.9px] py-2 rounded-[15px]"
+                >
                     Log In
                 </button>
 
