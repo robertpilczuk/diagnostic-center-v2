@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext.tsx";
 import backgroundImage from "../assets/login_bg.png"
 
@@ -66,9 +66,9 @@ const LoginPage = () => {
 
                 <div className="text-[14.1px] text-[#423F32]">
                     Don’t have an account?{" "}
-                    <a href="#" className="underline text-[#8E0871]">
+                    <Link to="/register" className="underline text-[#8E0871]">
                         Register here
-                    </a>
+                    </Link>
                 </div>
 
                 {/* Linie + OR */}
