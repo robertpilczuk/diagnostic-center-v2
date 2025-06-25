@@ -5,6 +5,7 @@ import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import RoleRouter from "./pages/RoleRouter";
 import DoctorLayout from "./pages/DoctorLayout";
+import DoctorHome from "./pages/doctor/HomePage";
 import LabLayout from "./pages/LabLayout";
 import PatientLayout from "./pages/PatientLayout";
 import RegisterPage from "./pages/RegistrationPage";
@@ -39,6 +40,8 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route index element={<DoctorHome />} />
+
           <Route
             path="/lab"
             element={
