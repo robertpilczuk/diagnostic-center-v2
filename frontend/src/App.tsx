@@ -4,10 +4,12 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import RoleRouter from "./pages/RoleRouter";
-import DoctorLayout from "./pages/DoctorLayout";
+import DoctorLayout from "./layouts/DoctorLayout";
 import DoctorHome from "./pages/doctor/HomePage";
-import LabLayout from "./pages/LabLayout";
-import PatientLayout from "./pages/PatientLayout";
+import PatientHome from "./pages/patient/HomePage";
+import LabHome from "./pages/lab/HomePage";
+import LabLayout from "./layouts/LabLayout";
+import PatientLayout from "./layouts/PatientLayout";
 import RegisterPage from "./pages/RegistrationPage";
 
 import type { ReactElement } from "react";
@@ -50,6 +52,8 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route index element={<LabHome />}>
+          </Route>
           <Route
             path="/patient"
             element={
@@ -58,6 +62,8 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route index element={<PatientHome />}>
+          </Route>
         </Routes>
       </BrowserRouter>
     </AuthProvider>
