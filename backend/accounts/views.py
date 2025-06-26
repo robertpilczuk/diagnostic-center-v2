@@ -20,17 +20,22 @@ class MeView(APIView):
 
 class RegisterView(APIView):
 
-    permission_classes = [AllowAny]  # <--- DODAJ TO
+    permission_classes = [AllowAny]
 
     @swagger_auto_schema(request_body=RegisterSerializer)
     def post(self, request):
         is_admin = request.user.is_authenticated and request.user.is_admin
 
-        if not is_admin and request.data.get("user_type") != "is_patient":
+        if request.user.is_authenticated:
             return Response(
-                {"error": "Only patients can register through this endpoint."},
-                status=status.HTTP_403_FORBIDDEN,
+                {"error": "You are already logged in."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
+        # if not is_admin and request.data.get("user_type") != "is_patient":
+        #     return Response(
+        #         {"error": "Only patients can register through this endpoint."},
+        #         status=status.HTTP_403_FORBIDDEN,
+        #     )
 
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
