@@ -18,33 +18,10 @@ const LoginPage = () => {
         setError("");
 
         try {
-            // const response = await axios.post("api/token/", { username, password });
-            const response = await api.post("token/", { username, password });
-            const access = response.data.access;
-            const refresh = response.data.refresh;
-
-            auth.login(access, refresh);
-
-            const userRes = await axios.get("/api/me", {
-                headers: {
-                    Authorization: `Bearer ${access}`,
-                },
-            });
-
-            const { is_patient, is_doctor, is_laboratory } = userRes.data;
-
-            if (is_patient) {
-                navigate("/patient");
-            } else if (is_doctor) {
-                navigate("/doctor");
-            } else if (is_laboratory) {
-                navigate("/lab");
-            } else {
-                navigate("/");
-            }
+            await auth.loginUser(username, password);
         } catch (err) {
             console.error(err);
-            setError("invalid credentials");
+            setError("Invalid credentials");
         }
     };
 

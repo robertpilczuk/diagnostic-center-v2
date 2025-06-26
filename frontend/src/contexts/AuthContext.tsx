@@ -59,18 +59,45 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const loginUser = async (username: string, password: string) => {
         try {
-            const response = await axios.post("/api/token/", {
+
+            console.log("🔑 Sending login request...");
+
+            const response = await axios.post("/token/", {
                 username,
                 password,
             });
 
             const { access, refresh } = response.data;
-            login(access, refresh);
+            // login(access, refresh);
+            console.log("✅ Received tokens:", access, refresh);
 
-            navigate("/dashboard");
-        } catch (error) {
-            console.error("Login failed:", error);
-            alert("Invalid credentials");
+            const userRes = await axios.get("me/", {
+                headers: { Authorization: `Bearer ${access}` },
+            });
+
+            console.log("✅ Received user data:", userRes.data);
+
+            const userData = userRes.data;
+            login(access, refresh);
+            setUser(userData);
+
+            console.log("User data fetched:", userData);
+            if (userData.is_patient) {
+                console.log("🚀 Navigating to /patient/home");
+                navigate("/patient/home");
+            } else if (userData.is_doctor) {
+                console.log("🚀 Navigating to /doctor/home");
+                navigate("/doctor/home");
+            } else if (userData.is_laboratory) {
+                console.log("🚀 Navigating to /lab/home");
+                navigate("/lab/home");
+            } else {
+                console.log("❓ Unknown role. Redirecting to /");
+                navigate("/");
+            }
+        } catch (error: any) {
+            console.error("❌ Login failed:", error);
+            alert("Login failed: " + (error.response?.data?.detail || "Unknown error"));
         }
 
     }
@@ -113,9 +140,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     );
 };
 
-export const useAuth = () => {
+function useAuth() {
     const context = useContext(AuthContext);
     if (!context)
         throw new Error("useAuth must be used within an AuthProvider");
     return context;
 };
+
+export { useAuth };

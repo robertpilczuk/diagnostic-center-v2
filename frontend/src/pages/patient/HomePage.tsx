@@ -1,3 +1,4 @@
+import { Navigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
 const mockTests = [
@@ -8,6 +9,12 @@ const mockTests = [
 
 const PatientHome = () => {
     const { user } = useAuth();
+
+    if (!user) return <div>Loading...</div>
+
+    if (!user.is_patient) {
+        return <Navigate to="/" />;
+    }
 
     return (
         <div className="max-w-3xl mx-auto py-8 px-4">

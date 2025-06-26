@@ -84,14 +84,15 @@ function App() {
             </PrivateRoute>
           }
         />
-        <Route
+        <Route path="/patient/home" element={<div>✅ Działa dashboard pacjenta</div>} />
+        {/* <Route
           path="/patient/home"
           element={
             <PrivateRoute>
               <PatientHome />
             </PrivateRoute>
           }
-        />
+        /> */}
       </Routes>
     </AuthProvider>
   );
