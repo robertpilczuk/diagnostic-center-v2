@@ -30,8 +30,15 @@ const RegisterPage = () => {
             await axios.post("/api/register/", formData);
             navigate("/login");
         } catch (err: any) {
-            setError("Registration failed.");
-            console.error(err);
+            if (err.response?.data) {
+                const raw = err.response.data;
+                const errorText = typeof raw === "string" ? raw : Object.values(raw).flat().join(" ");
+                setError(errorText);
+            } else {
+                setError("Registration failed.");
+            }
+            // setError("Registration failed.");
+            // console.error(err);
         }
     };
 
