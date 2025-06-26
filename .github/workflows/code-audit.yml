@@ -1,0 +1,43 @@
+name: Code Audit
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # pozwala też uruchomić ręcznie z GUI
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install tree
+        run: sudo apt-get update && sudo apt-get install -y tree
+
+      - name: Generate project structure (tree)
+        run: |
+          echo "Generating directory tree..."
+          tree -L 3 -a --noreport > project_structure.txt
+          cat project_structure.txt
+
+      - name: Count lines of code
+        run: |
+          echo "Counting lines of code..."
+          find . -type f \( -name '*.py' -o -name '*.html' -o -name '*.ts' -o -name '*.tsx' -o -name '*.js' \) \
+            ! -path "*/node_modules/*" ! -path "*/venv/*" ! -path "*/.venv/*" \
+            -exec wc -l {} + | tee line_count.txt
+          echo "=============================" >> line_count.txt
+          echo "Total lines of code:" >> line_count.txt
+          awk '{total += $1} END {print total}' line_count.txt >> line_count.txt
+          cat line_count.txt
+
+      - name: Upload audit artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: code-audit-results
+          path: |
+            line_count.txt
+            project_structure.txt
