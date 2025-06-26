@@ -12,6 +12,9 @@ import { useNavigate } from "react-router-dom";
 interface User {
     username: string;
     role: "Doctor" | "Laboratory" | "Patient";
+    is_patient?: boolean;
+    is_doctor?: boolean;
+    is_laboratory?: boolean;
 }
 
 interface AuthContextType {
@@ -53,8 +56,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setToken(null);
         setRefreshToken(null);
         setUser(null);
-        localStorage.removeItem("token")
-        localStorage.removeItem("refresh")
+        localStorage.removeItem("token");
+        localStorage.removeItem("refresh");
+        navigate("/login");
     };
 
     const loginUser = async (username: string, password: string) => {
@@ -119,7 +123,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const interval = setInterval(() => {
             if (refreshToken) {
                 axios
-                    .post("/api/token/refresh/", { refresh: refreshToken })
+                    .post("/token/refresh/", { refresh: refreshToken })
                     .then((res) => {
                         setToken(res.data.access);
                         localStorage.setItem("token", res.data.access);

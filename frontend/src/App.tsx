@@ -83,16 +83,24 @@ function App() {
               <PatientLayout />
             </PrivateRoute>
           }
-        />
-        <Route path="/patient/home" element={<div>✅ Działa dashboard pacjenta</div>} />
-        {/* <Route
-          path="/patient/home"
-          element={
-            <PrivateRoute>
-              <PatientHome />
-            </PrivateRoute>
-          }
-        /> */}
+        >
+          <Route
+            index
+            element={
+              <PrivateRoute>
+                <PatientHome />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="home"
+            element={
+              <PrivateRoute>
+                <PatientHome />
+              </PrivateRoute>
+            }
+          />
+        </Route>
       </Routes>
     </AuthProvider>
   );
