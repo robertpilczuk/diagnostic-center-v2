@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext.tsx";
 import backgroundImage from "../assets/login_bg.png"
+import api from "../api/axios";
 
 const LoginPage = () => {
     const [username, setUsername] = useState("");
@@ -17,7 +18,8 @@ const LoginPage = () => {
         setError("");
 
         try {
-            const response = await axios.post("api/token/", { username, password });
+            // const response = await axios.post("api/token/", { username, password });
+            const response = await api.post("token/", { username, password });
             const access = response.data.access;
             const refresh = response.data.refresh;
 
