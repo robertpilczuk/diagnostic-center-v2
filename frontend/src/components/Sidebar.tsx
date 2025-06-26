@@ -17,6 +17,9 @@ const Sidebar = ({ role }: SidebarProps) => {
     const commonLinks = [
         { to: `/${role}`, label: "Home" },
         { to: `/${role}/reports`, label: "Reports" },
+        ...(role === "patient"
+            ? [{ to: `/${role}/tests`, label: "My Tests" }]
+            : []),
     ];
 
     return (
