@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         if (token) {
             axios
-                .get("/api/me/", {
+                .get("/me/", {
                     headers: { Authorization: `Bearer ${token}` },
                 })
                 .then((res) => setUser(res.data))

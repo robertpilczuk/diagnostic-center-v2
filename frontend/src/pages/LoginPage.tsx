@@ -40,7 +40,7 @@ const LoginPage = () => {
             } else if (is_laboratory) {
                 navigate("/lab");
             } else {
-                navigate("/dashboard");
+                navigate("/");
             }
         } catch (err) {
             console.error(err);
