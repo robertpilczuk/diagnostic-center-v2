@@ -1,16 +1,18 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
-import RoleRouter from "./pages/RoleRouter";
+import RegisterPage from "./pages/RegistrationPage";
+
 import DoctorLayout from "./layouts/DoctorLayout";
 import DoctorHome from "./pages/doctor/HomePage";
-import PatientHome from "./pages/patient/HomePage";
-import LabHome from "./pages/lab/HomePage";
+
 import LabLayout from "./layouts/LabLayout";
+import LabHome from "./pages/lab/HomePage";
+
 import PatientLayout from "./layouts/PatientLayout";
-import RegisterPage from "./pages/RegistrationPage";
+import PatientHome from "./pages/patient/HomePage";
 
 import type { ReactElement } from "react";
 
@@ -22,52 +24,77 @@ const PrivateRoute = ({ children }: { children: ReactElement }) => {
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route
-            path="/"
-            element={
-              <PrivateRoute>
-                <DashboardPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/doctor"
-            element={
-              <PrivateRoute>
-                <DoctorLayout />
-              </PrivateRoute>
-            }
-          />
-          <Route index element={<DoctorHome />} />
+      <Routes>
+        {/* Public routes */}
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/login" element={<LoginPage />} />
 
-          <Route
-            path="/lab"
-            element={
-              <PrivateRoute>
-                <LabLayout />
-              </PrivateRoute>
-            }
-          />
-          <Route index element={<LabHome />}>
-          </Route>
-          <Route
-            path="/patient"
-            element={
-              <PrivateRoute>
-                <PatientLayout />
-              </PrivateRoute>
-            }
-          />
-          <Route index element={<PatientHome />}>
-          </Route>
-        </Routes>
-      </BrowserRouter>
+        {/* Dashboard after login */}
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <DashboardPage />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Doctor routes */}
+        <Route
+          path="/doctor"
+          element={
+            <PrivateRoute>
+              <DoctorLayout />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/doctor/home"
+          element={
+            <PrivateRoute>
+              <DoctorHome />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Laboratory routes */}
+        <Route
+          path="/lab"
+          element={
+            <PrivateRoute>
+              <LabLayout />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/lab/home"
+          element={
+            <PrivateRoute>
+              <LabHome />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Patient routes */}
+        <Route
+          path="/patient"
+          element={
+            <PrivateRoute>
+              <PatientLayout />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/patient/home"
+          element={
+            <PrivateRoute>
+              <PatientHome />
+            </PrivateRoute>
+          }
+        />
+      </Routes>
     </AuthProvider>
-  )
+  );
 }
 
-export default App
+export default App;
