@@ -10,6 +10,7 @@ import DoctorHome from "./pages/doctor/HomePage";
 
 import LabLayout from "./layouts/LabLayout";
 import LabHome from "./pages/lab/HomePage";
+import LabTestDetailsPage from "./pages/lab/LabTestDetailPage";
 
 import PatientLayout from "./layouts/PatientLayout";
 import PatientHome from "./pages/patient/HomePage";
@@ -89,6 +90,14 @@ function App() {
           element={
             <PrivateRoute allowedRoles={["Laboratory"]}>
               <LabHome />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/lab/test/:id"
+          element={
+            <PrivateRoute allowedRoles={["Laboratory"]}>
+              <LabTestDetailsPage />
             </PrivateRoute>
           }
         />
