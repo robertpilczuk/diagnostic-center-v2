@@ -15,13 +15,28 @@ import PatientLayout from "./layouts/PatientLayout";
 import PatientHome from "./pages/patient/HomePage";
 import PatientTestsPage from "./pages/patient/PatientTestsPage";
 import PatientAppointmentsPage from "./pages/patient/PatientAppointmentsPage";
-import type { ReactElement } from "react";
 import PatientPrescriptionsPage from "./pages/patient/PatientPrescriptionsPage";
 import PatientReportsPage from "./pages/patient/ReportsPage";
 
-const PrivateRoute = ({ children }: { children: ReactElement }) => {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? children : <Navigate to="/login" />;
+import type { ReactElement } from "react";
+
+type PrivateRouteProps = {
+  children: ReactElement;
+  allowedRoles?: string[];
+};
+
+const PrivateRoute = ({ children, allowedRoles }: PrivateRouteProps) => {
+  const { isAuthenticated, user } = useAuth();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (allowedRoles && (!user || !allowedRoles.includes(user.role))) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  return children;
 };
 
 function App() {
@@ -46,7 +61,7 @@ function App() {
         <Route
           path="/doctor"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={["Doctor"]}>
               <DoctorLayout />
             </PrivateRoute>
           }
@@ -54,7 +69,7 @@ function App() {
         <Route
           path="/doctor/home"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={["Doctor"]}>
               <DoctorHome />
             </PrivateRoute>
           }
@@ -64,7 +79,7 @@ function App() {
         <Route
           path="/lab"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={["Laboratory"]}>
               <LabLayout />
             </PrivateRoute>
           }
@@ -72,7 +87,7 @@ function App() {
         <Route
           path="/lab/home"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={["Laboratory"]}>
               <LabHome />
             </PrivateRoute>
           }
@@ -82,62 +97,21 @@ function App() {
         <Route
           path="/patient"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={["Patient"]}>
               <PatientLayout />
             </PrivateRoute>
           }
         >
-          <Route
-            index
-            element={
-              <PrivateRoute>
-                <PatientHome />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="home"
-            element={
-              <PrivateRoute>
-                <PatientHome />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/patient/tests"
-            element={
-              <PrivateRoute>
-                <PatientTestsPage />
-              </PrivateRoute>
-            }
-          >
-          </Route>
-          <Route
-            path="/patient/appointments"
-            element={
-              <PrivateRoute>
-                <PatientAppointmentsPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/patient/prescriptions"
-            element={
-              <PrivateRoute>
-                <PatientPrescriptionsPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/patient/reports"
-            element={
-              <PrivateRoute>
-                <PatientReportsPage />
-              </PrivateRoute>
-            }
-          />
-
+          <Route index element={<PatientHome />} />
+          <Route path="home" element={<PatientHome />} />
+          <Route path="tests" element={<PatientTestsPage />} />
+          <Route path="appointments" element={<PatientAppointmentsPage />} />
+          <Route path="prescriptions" element={<PatientPrescriptionsPage />} />
+          <Route path="reports" element={<PatientReportsPage />} />
         </Route>
+
+        {/* Optional: unauthorized fallback */}
+        <Route path="/unauthorized" element={<div className="p-8 text-red-600 font-bold">Access denied</div>} />
       </Routes>
     </AuthProvider>
   );
