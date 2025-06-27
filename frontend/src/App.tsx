@@ -17,6 +17,7 @@ import PatientTestsPage from "./pages/patient/PatientTestsPage";
 import PatientAppointmentsPage from "./pages/patient/PatientAppointmentsPage";
 import type { ReactElement } from "react";
 import PatientPrescriptionsPage from "./pages/patient/PatientPrescriptionsPage";
+import PatientReportsPage from "./pages/patient/ReportsPage";
 
 const PrivateRoute = ({ children }: { children: ReactElement }) => {
   const { isAuthenticated } = useAuth();
@@ -127,6 +128,15 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/patient/reports"
+            element={
+              <PrivateRoute>
+                <PatientReportsPage />
+              </PrivateRoute>
+            }
+          />
+
         </Route>
       </Routes>
     </AuthProvider>
