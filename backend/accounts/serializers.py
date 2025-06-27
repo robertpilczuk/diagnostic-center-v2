@@ -51,6 +51,8 @@ class RegisterSerializer(serializers.Serializer):
 
 
 class UserMeSerializer(serializers.ModelSerializer):
+    role = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = [
@@ -61,4 +63,14 @@ class UserMeSerializer(serializers.ModelSerializer):
             "is_doctor",
             "is_laboratory",
             "is_verified",
+            "role",
         ]
+
+    def get_role(self, obj):
+        if obj.is_patient:
+            return "Patient"
+        elif obj.is_doctor:
+            return "Doctor"
+        elif obj.is_laboratory:
+            return "Laboratory"
+        return "Unknown"
