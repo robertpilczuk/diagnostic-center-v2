@@ -100,15 +100,16 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/patient/tests"
+            element={
+              <PrivateRoute>
+                <PatientTestsPage />
+              </PrivateRoute>
+            }
+          >
+          </Route>
         </Route>
-        <Route
-          path="/patient/tests"
-          element={
-            <PrivateRoute>
-              <PatientTestsPage />
-            </PrivateRoute>
-          }
-        ></Route>
       </Routes>
     </AuthProvider>
   );
