@@ -14,6 +14,7 @@ import LabHome from "./pages/lab/HomePage";
 import PatientLayout from "./layouts/PatientLayout";
 import PatientHome from "./pages/patient/HomePage";
 import PatientTestsPage from "./pages/patient/PatientTestsPage";
+import PatientAppointmentsPage from "./pages/patient/PatientAppointmentsPage";
 import type { ReactElement } from "react";
 
 const PrivateRoute = ({ children }: { children: ReactElement }) => {
@@ -109,6 +110,14 @@ function App() {
             }
           >
           </Route>
+          <Route
+            path="/patient/appointments"
+            element={
+              <PrivateRoute>
+                <PatientAppointmentsPage />
+              </PrivateRoute>
+            }
+          />
         </Route>
       </Routes>
     </AuthProvider>
