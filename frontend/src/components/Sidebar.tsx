@@ -18,6 +18,7 @@ const Sidebar = ({ role }: SidebarProps) => {
         { to: `/${role}`, label: "Home" },
         { to: `/${role}/reports`, label: "Reports" },
         { to: `/${role}/appointments`, label: "Appointments" },
+        { to: `/${role}/prescriptions`, label: "Prescriptions" },
         ...(role === "patient"
             ? [{ to: `/${role}/tests`, label: "My Tests" }]
             : []),
