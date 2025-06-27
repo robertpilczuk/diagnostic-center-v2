@@ -10,6 +10,7 @@ from .views import (
     LaboratoryVerifyView,
     LabTestOrderListView,
     LabTestOrderDetailView,
+    SampleByTestOrderView,
 )
 
 urlpatterns = [
@@ -35,4 +36,5 @@ urlpatterns = [
         LabTestOrderDetailView.as_view(),
         name="lab-test-detail",
     ),
+    path("samples/", SampleByTestOrderView.as_view(), name="sample-by-test-order"),
 ]

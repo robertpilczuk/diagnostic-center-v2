@@ -17,6 +17,9 @@ from .serializers import LaboratoryAdminSerializer
 from rest_framework.permissions import IsAdminUser
 from doctor.models import TestOrder
 from doctor.serializers import TestOrderDetailSerializer
+from laboratory.models import Sample
+from rest_framework.filters import OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class LabTestListView(ListAPIView):
@@ -147,23 +150,11 @@ class LabTestOrderDetailView(APIView):
         return Response(serializer.data)
 
 
-# class LabTestOrderDetailView(APIView):
-#     permission_classes = [IsAuthenticated]
+class SampleByTestOrderView(ListAPIView):
+    serializer_class = SampleSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ["test_order"]
 
-#     def get(self, request, id):
-#         try:
-#             test_order = TestOrder.objects.select_related("patient__user").get(id=id)
-#         except TestOrder.DoesNotExist:
-#             return Response({"error": "Not found"}, status=404)
-
-#         result = TestResult.objects.filter(sample__test_order=test_order).first()
-#         return Response(
-#             {
-#                 "id": test_order.id,
-#                 "test_name": test_order.test_name,
-#                 "ordered_at": test_order.ordered_at,
-#                 "patient_username": test_order.patient.user.username,
-#                 "patient_pesel": test_order.patient.pesel,
-#                 "result_data": result.result_data if result else None,
-#                 "result_id": result.id if result else None,
-#             }
+    def get_queryset(self):
+        return Sample.objects.all()
