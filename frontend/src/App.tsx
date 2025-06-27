@@ -13,7 +13,7 @@ import LabHome from "./pages/lab/HomePage";
 
 import PatientLayout from "./layouts/PatientLayout";
 import PatientHome from "./pages/patient/HomePage";
-import MyTests from "./pages/patient/MyTests";
+import PatientTestsPage from "./pages/patient/PatientTestsPage";
 import type { ReactElement } from "react";
 
 const PrivateRoute = ({ children }: { children: ReactElement }) => {
@@ -105,7 +105,7 @@ function App() {
           path="/patient/tests"
           element={
             <PrivateRoute>
-              <MyTests />
+              <PatientTestsPage />
             </PrivateRoute>
           }
         ></Route>
