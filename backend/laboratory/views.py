@@ -1,5 +1,5 @@
 ﻿from rest_framework.generics import ListAPIView
-from .models import LabTest,Laboratory
+from .models import LabTest, Laboratory
 from .serializers import LabTestSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -11,10 +11,13 @@ from .serializers import (
     AppointmentRequestSerializer,
     AppointmentStatusUpdateSerializer,
     SampleSerializer,
-    TestResultSerializer
+    TestResultSerializer,
 )
 from .serializers import LaboratoryAdminSerializer
 from rest_framework.permissions import IsAdminUser
+from doctor.models import TestOrder
+from doctor.serializers import TestOrderDetailSerializer
+
 
 class LabTestListView(ListAPIView):
     queryset = LabTest.objects.all()
@@ -29,6 +32,7 @@ class AppointmentRequestListView(APIView):
         serializer = AppointmentRequestSerializer(appointments, many=True)
         return Response(serializer.data)
 
+
 class AppointmentRequestUpdateView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -38,11 +42,14 @@ class AppointmentRequestUpdateView(APIView):
         except AppointmentRequest.DoesNotExist:
             return Response({"error": "Not found"}, status=404)
 
-        serializer = AppointmentStatusUpdateSerializer(appointment, data=request.data, partial=True)
+        serializer = AppointmentStatusUpdateSerializer(
+            appointment, data=request.data, partial=True
+        )
         if serializer.is_valid():
             serializer.save()
             return Response({"message": "Status updated"})
         return Response(serializer.errors, status=400)
+
 
 class SampleCreateView(APIView):
     permission_classes = [IsAuthenticated]
@@ -51,8 +58,11 @@ class SampleCreateView(APIView):
         serializer = SampleSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({"message": "Sample registered"}, status=status.HTTP_201_CREATED)
+            return Response(
+                {"message": "Sample registered"}, status=status.HTTP_201_CREATED
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class TestResultCreateView(APIView):
     permission_classes = [IsAuthenticated]
@@ -61,8 +71,11 @@ class TestResultCreateView(APIView):
         serializer = TestResultSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({"message": "Test result added"}, status=status.HTTP_201_CREATED)
+            return Response(
+                {"message": "Test result added"}, status=status.HTTP_201_CREATED
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class TestResultDownloadView(APIView):
     permission_classes = [IsAuthenticated]
@@ -76,12 +89,13 @@ class TestResultDownloadView(APIView):
         if not result.pdf_file:  # lub `result.file`, zależnie od nazwy pola
             raise Http404("Plik PDF nie został wygenerowany.")
 
-        file_path = result.pdf_file.path  # Zakładamy, że masz `FileField` lub `PDFField` w modelu
+        file_path = (
+            result.pdf_file.path
+        )  # Zakładamy, że masz `FileField` lub `PDFField` w modelu
         if not os.path.exists(file_path):
             raise Http404("Plik PDF nie istnieje na serwerze.")
 
-        return FileResponse(open(file_path, 'rb'), content_type='application/pdf')
-
+        return FileResponse(open(file_path, "rb"), content_type="application/pdf")
 
 
 class LaboratoryListForVerificationView(APIView):
@@ -101,3 +115,43 @@ class LaboratoryVerifyView(APIView):
         lab.is_verified = True
         lab.save()
         return Response({"status": "verified"}, status=status.HTTP_200_OK)
+
+
+class LabTestOrderListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        test_orders = TestOrder.objects.all().select_related("patient__user")
+        data = [
+            {
+                "id": t.id,
+                "test_name": t.test_name,
+                "ordered_at": t.ordered_at,
+                "patient": t.patient.user.username,
+            }
+            for t in test_orders
+        ]
+        return Response(data)
+
+
+class LabTestOrderDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, id):
+        try:
+            test_order = TestOrder.objects.select_related("patient__user").get(id=id)
+        except TestOrder.DoesNotExist:
+            return Response({"error": "Not found"}, status=404)
+
+        result = TestResult.objects.filter(sample__test_order=test_order).first()
+        return Response(
+            {
+                "id": test_order.id,
+                "test_name": test_order.test_name,
+                "ordered_at": test_order.ordered_at,
+                "patient_username": test_order.patient.user.username,
+                "patient_pesel": test_order.patient.pesel,
+                "result_data": result.result_data if result else None,
+                "result_id": result.id if result else None,
+            }
+        )
