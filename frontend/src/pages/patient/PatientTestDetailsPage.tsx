@@ -2,49 +2,55 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "../../api/axios";
 
-interface TestResult {
+interface PatientTestDetails {
     id: number;
+    test_name: string;
+    ordered_at: string;
+    doctor_name: string;
     description: string;
-    pdf_file: string;
-    created_at: string;
+    result_pdf_url: string;
 }
 
 const PatientTestDetailsPage = () => {
     const { id } = useParams();
-    const [results, setResults] = useState<TestResult[]>([]);
+    const [test, setTest] = useState<PatientTestDetails | null>(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
     useEffect(() => {
-        api.get(`/patient/tests/${id}/results/`)
-            .then(res => setResults(res.data))
-            .catch(err => console.error("❌ Failed to fetch test results:", err))
+        api.get(`/patient/tests/${id}/`)
+            .then((res) => setTest(res.data))
+            .catch((err) => {
+                console.error("❌ Failed to fetch test details:", err);
+                setError("Failed to load test details.");
+            })
             .finally(() => setLoading(false));
     }, [id]);
 
+    if (loading) return <div className="p-8">Loading...</div>;
+    if (error) return <div className="p-8 text-red-600">{error}</div>;
+    if (!test) return <div className="p-8">No data found.</div>;
+
     return (
-        <div className="p-8 max-w-2xl mx-auto">
-            <h1 className="text-2xl font-bold mb-4">Test Details</h1>
-            {loading ? (
-                <div>Loading...</div>
-            ) : results.length > 0 ? (
-                <ul className="space-y-4">
-                    {results.map(result => (
-                        <li key={result.id} className="p-4 bg-white rounded shadow">
-                            <div><strong>Description:</strong> {result.description}</div>
-                            <div><strong>Date:</strong> {new Date(result.created_at).toLocaleString()}</div>
-                            <a
-                                href={result.pdf_file}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-fuchsia-700 hover:underline block mt-2"
-                            >
-                                Download PDF
-                            </a>
-                        </li>
-                    ))}
-                </ul>
+        <div className="max-w-2xl mx-auto p-8 bg-white shadow-lg rounded-lg mt-10">
+            <h1 className="text-2xl font-bold mb-4">{test.test_name}</h1>
+            <p className="mb-2"><strong>Ordered at:</strong> {new Date(test.ordered_at).toLocaleString()}</p>
+            <p className="mb-2"><strong>Doctor:</strong> {test.doctor_name}</p>
+            <div className="mb-4">
+                <strong>Description:</strong>
+                <p className="mt-1 text-gray-700">{test.description}</p>
+            </div>
+            {test.result_pdf_url ? (
+                <a
+                    href={test.result_pdf_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block bg-fuchsia-700 text-white px-4 py-2 rounded hover:bg-fuchsia-800"
+                >
+                    Download PDF
+                </a>
             ) : (
-                <div className="text-gray-600">No results available yet.</div>
+                <p className="text-gray-500">No PDF file available.</p>
             )}
         </div>
     );

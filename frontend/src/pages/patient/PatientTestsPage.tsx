@@ -18,7 +18,18 @@ const PatientTestsPage = () => {
 
     useEffect(() => {
         api.get("/patient/tests/")
-            .then((res) => setTests(res.data))
+            .then((res) => {
+                setTests(
+                    res.data.map((t: any) => ({
+                        id: t.id,
+                        name: t.test_name,
+                        status: "Completed", // albo z backendu, jak będzie
+                        date: new Date(t.ordered_at).toLocaleDateString(),
+                        doctor: t.doctor_name,
+                        reportUrl: t.result_pdf_url,
+                    }))
+                );
+            })
             .catch((err) => console.error("❌ Failed to fetch tests:", err))
             .finally(() => setLoading(false));
     }, []);

@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListAPIView
 from rest_framework.filters import SearchFilter
+from .serializers import PatientTestResultSerializer
 
 from .serializers import (
     PrescriptionSerializer,
@@ -32,6 +33,16 @@ class TestResultListView(APIView):
             sample__test_order__patient__user=request.user
         )
         serializer = TestResultSerializer(results, many=True)
+        return Response(serializer.data)
+
+
+class PatientTestListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        patient = request.user.patient
+        results = TestResult.objects.filter(sample__test_order__patient=patient)
+        serializer = PatientTestResultSerializer(results, many=True)
         return Response(serializer.data)
 
 

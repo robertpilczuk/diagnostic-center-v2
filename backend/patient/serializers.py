@@ -29,3 +29,14 @@ class PatientListSerializer(serializers.ModelSerializer):
             "pesel",
             "date_of_birth",
         ]
+
+
+class PatientTestResultSerializer(serializers.ModelSerializer):
+    test_name = serializers.CharField(source="sample.test_order.test_name")
+    ordered_at = serializers.DateTimeField(source="sample.test_order.ordered_at")
+    doctor_name = serializers.CharField(source="sample.test_order.doctor.user.username")
+    result_pdf_url = serializers.FileField(source="pdf", read_only=True)
+
+    class Meta:
+        model = TestResult
+        fields = ["id", "test_name", "ordered_at", "doctor_name", "result_pdf_url"]
