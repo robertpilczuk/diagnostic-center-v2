@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { useParams } from "react-router-dom";
 import api from "../../api/axios";
-import type { ChangeEvent, FormEvent } from "react";
 
 interface TestOrder {
     id: number;
@@ -35,21 +34,20 @@ const TestOrderDetailsPage = () => {
             try {
                 const response = await api.get(`/lab/test-orders/${id}/`);
                 setOrder(response.data);
-            } catch (err) {
+            } catch {
                 setError("Failed to fetch order details");
             }
         };
 
         const fetchSample = async () => {
             try {
-                const response = await api.get(`/lab/samples/?test_order=${id}`);
+                const response = await api.get(`/samples/?test_order=${id}`);
                 if (response.data.length > 0) {
-                    const sample = response.data[0]; // załóżmy że jeden sample
-                    setSampleId(sample.id);
-                    setFormData(prev => ({ ...prev, sample_id: sample.id }));
+                    setSampleId(response.data[0].id);
+                    setFormData((prev) => ({ ...prev, sample_id: response.data[0].id }));
                 }
             } catch (err) {
-                console.error("Could not fetch sample:", err);
+                console.error("Failed to fetch sample:", err);
             }
         };
 
@@ -58,74 +56,74 @@ const TestOrderDetailsPage = () => {
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
-            setFormData(prev => ({ ...prev, pdf: e.target.files![0] }));
+            setFormData((prev) => ({ ...prev, pdf: e.target.files![0] }));
         }
     };
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         if (!formData.sample_id || !formData.pdf) {
-            setMessage("Sample ID or PDF is missing.");
+            setMessage("Missing sample ID or PDF file.");
             return;
         }
 
-        const submission = new FormData();
-        submission.append("description", formData.description);
-        submission.append("pdf", formData.pdf);
-        submission.append("sample", String(formData.sample_id));
+        const data = new FormData();
+        data.append("description", formData.description);
+        data.append("pdf", formData.pdf);
+        data.append("sample", String(formData.sample_id));
 
         try {
-            await api.post("/lab/test-results/", submission, {
+            await api.post("/test-results/", data, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
-            setMessage("Test result submitted successfully.");
-        } catch (err) {
-            console.error(err);
-            setMessage("Submission failed.");
+            setMessage("Result submitted successfully.");
+        } catch {
+            setMessage("Failed to submit result.");
         }
     };
 
-    if (loading) return <div className="p-4">Loading...</div>;
-    if (error) return <div className="p-4 text-red-500">{error}</div>;
-    if (!order) return <div className="p-4">No data found.</div>;
+    if (loading) return <div className="p-6">Loading...</div>;
+    if (error) return <div className="p-6 text-red-500">{error}</div>;
+    if (!order) return <div className="p-6">No data found.</div>;
 
     return (
-        <div className="p-6 max-w-xl mx-auto bg-white shadow-xl rounded-xl">
-            <h1 className="text-2xl font-bold mb-4">Test Order Details</h1>
-            <p><strong>Test name:</strong> {order.test_name}</p>
+        <div className="p-6 max-w-xl mx-auto bg-white shadow-xl rounded-xl space-y-4">
+            <h1 className="text-2xl font-bold">Test Order Details</h1>
+            <p><strong>Test:</strong> {order.test_name}</p>
             <p><strong>Ordered at:</strong> {new Date(order.ordered_at).toLocaleString()}</p>
             <p><strong>Patient:</strong> {order.patient_username} (PESEL: {order.patient_pesel})</p>
 
-            <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-                <div>
-                    <label className="block font-semibold">Description</label>
+            {sampleId ? (
+                <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+                    <h2 className="text-lg font-semibold">Add Test Result</h2>
                     <textarea
                         name="description"
+                        placeholder="Result description"
                         className="w-full border rounded p-2"
                         onChange={handleChange}
                         required
                     />
-                </div>
-                <div>
-                    <label className="block font-semibold">PDF File</label>
-                    <input type="file" onChange={handleFileChange} accept="application/pdf" />
-                </div>
-                {sampleId && (
-                    <p className="text-sm text-gray-600">Using sample ID: <strong>{sampleId}</strong></p>
-                )}
-                <button
-                    type="submit"
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                >
-                    Submit Result
-                </button>
-                {message && <p className="text-sm text-green-600">{message}</p>}
-            </form>
+                    <input
+                        type="file"
+                        accept="application/pdf"
+                        onChange={handleFileChange}
+                        className="block"
+                        required
+                    />
+                    <p className="text-sm text-gray-600">Sample ID: <strong>{sampleId}</strong></p>
+                    <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                        Submit Result
+                    </button>
+                    {message && <p className="text-sm mt-2">{message}</p>}
+                </form>
+            ) : (
+                <p className="text-gray-500 mt-4">No sample registered yet for this order.</p>
+            )}
         </div>
     );
 };
