@@ -12,6 +12,7 @@ import LabLayout from "./layouts/LabLayout";
 import LabHome from "./pages/lab/HomePage";
 import LabTestDetailsPage from "./pages/lab/LabTestDetailPage";
 import TestOrderDetailsPage from "./pages/lab/TestOrderDetailsPage";
+import LabTestsPage from "./pages/lab/LabTestsPage";
 
 import PatientLayout from "./layouts/PatientLayout";
 import PatientHome from "./pages/patient/HomePage";
@@ -85,6 +86,8 @@ function App() {
           <Route path="home" element={<LabHome />} />
           <Route path="test-orders/:id" element={<TestOrderDetailsPage />} />
           <Route path="test/:id" element={<LabTestDetailsPage />} />
+          <Route path="tests" element={<LabTestsPage />} />
+
         </Route>
 
         {/* Patient */}

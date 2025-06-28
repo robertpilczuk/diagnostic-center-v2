@@ -12,29 +12,10 @@ const Sidebar = () => {
     }
 
     let role = "";
-    if (user.is_patient) {
-        role = "Patient";
-    } else if (user.is_doctor) {
-        role = "Doctor";
-    } else if (user.is_laboratory) {
-        role = "Laboratory";
-    } else {
-        role = "Unknown";
-    }
-
-    console.log("Sidebar detected role:", role);
-
     const links: { to: string; label: string }[] = [];
 
-    if (role === "Doctor") {
-        links.push(
-            { to: "/doctor/home", label: "Home" },
-            { to: "/doctor/patients", label: "Patients" },
-            { to: "/doctor/reports", label: "Reports" },
-            { to: "/doctor/appointments", label: "Appointments" },
-            { to: "/doctor/prescriptions", label: "Prescriptions" },
-        );
-    } else if (role === "Patient") {
+    if (user.is_patient) {
+        role = "Patient";
         links.push(
             { to: "/patient/home", label: "Home" },
             { to: "/patient/tests", label: "My Tests" },
@@ -42,7 +23,17 @@ const Sidebar = () => {
             { to: "/patient/appointments", label: "Appointments" },
             { to: "/patient/prescriptions", label: "Prescriptions" },
         );
-    } else if (role === "Laboratory") {
+    } else if (user.is_doctor) {
+        role = "Doctor";
+        links.push(
+            { to: "/doctor/home", label: "Home" },
+            { to: "/doctor/patients", label: "Patients" },
+            { to: "/doctor/reports", label: "Reports" },
+            { to: "/doctor/appointments", label: "Appointments" },
+            { to: "/doctor/prescriptions", label: "Prescriptions" },
+        );
+    } else if (user.is_laboratory) {
+        role = "Laboratory";
         links.push(
             { to: "/lab/home", label: "Home" },
             { to: "/lab/tests", label: "Test Orders" },
@@ -55,9 +46,11 @@ const Sidebar = () => {
         );
     }
 
+    console.log("Sidebar detected role:", role);
+
     return (
         <div className="w-64 min-h-screen bg-blue-800 text-white p-4">
-            <h2 className="text-xl font-bold mb-6">{role} panel</h2>
+            <h2 className="text-xl font-bold mb-6">{role} Panel</h2>
             <ul className="space-y-2">
                 {links.map(link => (
                     <li key={link.to}>
