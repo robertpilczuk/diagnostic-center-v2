@@ -22,6 +22,7 @@ import PatientPrescriptionsPage from "./pages/patient/PatientPrescriptionsPage";
 import PatientReportsPage from "./pages/patient/ReportsPage";
 
 import type { ReactElement } from "react";
+import PatientTestDetailsPage from "./pages/patient/PatientTestDetailsPAge";
 
 type PrivateRouteProps = {
   children: ReactElement;
@@ -102,6 +103,7 @@ function App() {
           <Route index element={<PatientHome />} />
           <Route path="home" element={<PatientHome />} />
           <Route path="tests" element={<PatientTestsPage />} />
+          <Route path="tests/:id" element={<PatientTestDetailsPage />} />
           <Route path="appointments" element={<PatientAppointmentsPage />} />
           <Route path="prescriptions" element={<PatientPrescriptionsPage />} />
           <Route path="reports" element={<PatientReportsPage />} />

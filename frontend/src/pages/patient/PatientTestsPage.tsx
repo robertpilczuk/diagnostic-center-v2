@@ -1,56 +1,26 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import api from "../../api/axios";
 import backgroundImage from "../../assets/patient_tests_page_bg.png";
 
-interface Test {
+interface PatientTest {
     id: number;
-    name: string;
-    status: string;
-    date?: string;
-    doctor?: string;
-    reportUrl?: string;
+    test_name: string;
+    ordered_at: string;
+    doctor_name: string;
 }
-
-const mockTestsResults = [
-    {
-        id: 1,
-        test_name: "Morfologia",
-        status: "Completed",
-        date: "2025-05-10",
-        doctor: "Dr Anna Nowak",
-        reportUrl: "/mock/morfologia.pdf",
-    },
-    {
-        id: 2,
-        test_name: "Glukoza",
-        status: "Pending",
-        date: "2025-06-01",
-        doctor: "Dr Kowalski",
-        reportUrl: "",
-    },
-];
 
 const PatientTestsPage = () => {
     const { user } = useAuth();
-    const [tests, setTests] = useState<Test[]>([]);
+    const [tests, setTests] = useState<PatientTest[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setTests(
-                mockTestsResults.map((t) => ({
-                    id: t.id,
-                    name: t.test_name,
-                    status: t.status,
-                    date: t.date,
-                    doctor: t.doctor,
-                    reportUrl: t.reportUrl,
-                }))
-            );
-            setLoading(false);
-        }, 1000);
-
-        return () => clearTimeout(timer);
+        api.get("/patient/tests/")
+            .then((res) => setTests(res.data))
+            .catch((err) => console.error("❌ Failed to fetch tests:", err))
+            .finally(() => setLoading(false));
     }, []);
 
     if (loading) {
@@ -66,51 +36,52 @@ const PatientTestsPage = () => {
             className="w-screen min-h-screen flex flex-col items-center justify-center bg-cover bg-center px-4 gap-y-6"
             style={{ backgroundImage: `url(${backgroundImage})` }}
         >
-            {/* Nagłówek */}
             <div className="w-full max-w-3xl text-center">
                 <h1 className="text-[32px] font-bold text-[#323232]">Your test results</h1>
-                <h2 className="text-[24px] font-medium text-[#323232]/70 mt-2">Blood testing 1</h2>
+                <h2 className="text-[24px] font-medium text-[#323232]/70 mt-2">
+                    Laboratory testing summary
+                </h2>
             </div>
 
-            {/* Ramka */}
-            {/* Ramka z efektem glassmorphism */}
-            <div className="w-[844px] h-[185px] rounded-[25px] shadow-xl bg-white/40 backdrop-blur-[20px] px-6 py-6 flex items-center justify-center">
-                {/* Tabela w środku */}
+            <div className="w-[844px] rounded-[25px] shadow-xl bg-white/40 backdrop-blur-[20px] px-6 py-6 flex items-center justify-center">
                 <div className="w-full h-full overflow-y-auto overflow-x-hidden rounded-[15px] border border-gray-300 bg-white/70">
                     <table className="min-w-full text-md text-left text-gray-800">
                         <thead className="bg-white/90">
                             <tr>
                                 <th className="px-6 py-4 border-r">Test name</th>
-                                <th className="px-6 py-4 border-r">Test data</th>
+                                <th className="px-6 py-4 border-r">Ordered at</th>
                                 <th className="px-6 py-4 border-r">Doctor</th>
-                                <th className="px-6 py-4">Download report</th>
+                                <th className="px-6 py-4">Details</th>
                             </tr>
                         </thead>
                         <tbody>
                             {tests.map((test) => (
                                 <tr key={test.id} className="border-t border-gray-200 hover:bg-white/80">
-                                    <td className="px-6 py-4">{test.name}</td>
-                                    <td className="px-6 py-4">{test.date}</td>
-                                    <td className="px-6 py-4">{test.doctor}</td>
+                                    <td className="px-6 py-4">{test.test_name}</td>
+                                    <td className="px-6 py-4">{new Date(test.ordered_at).toLocaleDateString()}</td>
+                                    <td className="px-6 py-4">{test.doctor_name}</td>
                                     <td className="px-6 py-4">
-                                        <a
-                                            href={test.reportUrl}
+                                        <Link
+                                            to={`/patient/tests/${test.id}`}
                                             className="text-fuchsia-700 hover:underline font-medium"
                                         >
-                                            Download
-                                        </a>
+                                            View details
+                                        </Link>
                                     </td>
                                 </tr>
                             ))}
+                            {tests.length === 0 && (
+                                <tr>
+                                    <td colSpan={4} className="text-center py-4 text-gray-600">
+                                        No tests found.
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
             </div>
-
         </div>
-        // </div >
-
-
     );
 };
 
