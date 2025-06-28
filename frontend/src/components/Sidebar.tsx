@@ -1,34 +1,65 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
-interface SidebarProps {
-    role: "doctor" | "patient" | "lab";
-}
-
-const Sidebar = ({ role }: SidebarProps) => {
-    const { logout } = useAuth();
+const Sidebar = () => {
+    const { logout, user } = useAuth();
     const navigate = useNavigate();
 
-    const handleLogout = () => {
-        logout();
-        navigate("/login");
-    };
+    console.log("Sidebar rendered, user:", user);
 
-    const commonLinks = [
-        { to: `/${role}`, label: "Home" },
-        { to: `/${role}/reports`, label: "Reports" },
-        { to: `/${role}/appointments`, label: "Appointments" },
-        { to: `/${role}/prescriptions`, label: "Prescriptions" },
-        ...(role === "patient"
-            ? [{ to: `/${role}/tests`, label: "My Tests" }]
-            : []),
-    ];
+    if (!user) {
+        return <div className="w-64 p-4 text-gray-600">Loading sidebar...</div>;
+    }
+
+    let role = "";
+    if (user.is_patient) {
+        role = "Patient";
+    } else if (user.is_doctor) {
+        role = "Doctor";
+    } else if (user.is_laboratory) {
+        role = "Laboratory";
+    } else {
+        role = "Unknown";
+    }
+
+    console.log("Sidebar detected role:", role);
+
+    const links: { to: string; label: string }[] = [];
+
+    if (role === "Doctor") {
+        links.push(
+            { to: "/doctor/home", label: "Home" },
+            { to: "/doctor/patients", label: "Patients" },
+            { to: "/doctor/reports", label: "Reports" },
+            { to: "/doctor/appointments", label: "Appointments" },
+            { to: "/doctor/prescriptions", label: "Prescriptions" },
+        );
+    } else if (role === "Patient") {
+        links.push(
+            { to: "/patient/home", label: "Home" },
+            { to: "/patient/tests", label: "My Tests" },
+            { to: "/patient/reports", label: "Reports" },
+            { to: "/patient/appointments", label: "Appointments" },
+            { to: "/patient/prescriptions", label: "Prescriptions" },
+        );
+    } else if (role === "Laboratory") {
+        links.push(
+            { to: "/lab/home", label: "Home" },
+            { to: "/lab/tests", label: "Test Orders" },
+        );
+    } else {
+        return (
+            <div className="w-64 p-4 text-red-600">
+                Unknown role for user: {user.username}
+            </div>
+        );
+    }
 
     return (
         <div className="w-64 min-h-screen bg-blue-800 text-white p-4">
-            <h2 className="text-xl font-bold mb-6 capitalize">{role} panel</h2>
+            <h2 className="text-xl font-bold mb-6">{role} panel</h2>
             <ul className="space-y-2">
-                {commonLinks.map((link) => (
+                {links.map(link => (
                     <li key={link.to}>
                         <Link to={link.to} className="block hover:underline">
                             {link.label}
@@ -37,7 +68,10 @@ const Sidebar = ({ role }: SidebarProps) => {
                 ))}
                 <li>
                     <button
-                        onClick={handleLogout}
+                        onClick={() => {
+                            logout();
+                            navigate("/login");
+                        }}
                         className="mt-4 bg-red-500 px-3 py-1 rounded hover:bg-red-600"
                     >
                         Logout
@@ -46,7 +80,6 @@ const Sidebar = ({ role }: SidebarProps) => {
             </ul>
         </div>
     );
-
 };
 
-export default Sidebar
+export default Sidebar;

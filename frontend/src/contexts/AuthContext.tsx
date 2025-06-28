@@ -82,11 +82,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     useEffect(() => {
+        console.log("AuthContext mounted: token =", token);
+
         if (token) {
+            console.log("Fetching /me/");
+
             axios
                 .get("/me/")
-                .then((res) => setUser(res.data))
-                .catch(() => logout());
+                .then((res) => {
+                    console.log("✔ /me/ response:", res.data);
+                    setUser(res.data);
+                })
+                .catch((err) => {
+                    console.error("❌ /me/ failed", err);
+                    logout()
+                });
+        } else {
+            console.log("No token, user = null");
+            setUser(null);
         }
     }, [token]);
 

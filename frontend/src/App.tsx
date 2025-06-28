@@ -13,7 +13,6 @@ import LabHome from "./pages/lab/HomePage";
 import LabTestDetailsPage from "./pages/lab/LabTestDetailPage";
 import TestOrderDetailsPage from "./pages/lab/TestOrderDetailsPage";
 
-
 import PatientLayout from "./layouts/PatientLayout";
 import PatientHome from "./pages/patient/HomePage";
 import PatientTestsPage from "./pages/patient/PatientTestsPage";
@@ -46,11 +45,11 @@ function App() {
   return (
     <AuthProvider>
       <Routes>
-        {/* Public routes */}
+        {/* Public */}
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
 
-        {/* Dashboard after login */}
+        {/* Dashboard */}
         <Route
           path="/"
           element={
@@ -60,7 +59,7 @@ function App() {
           }
         />
 
-        {/* Doctor routes */}
+        {/* Doctor */}
         <Route
           path="/doctor"
           element={
@@ -68,17 +67,12 @@ function App() {
               <DoctorLayout />
             </PrivateRoute>
           }
-        />
-        <Route
-          path="/doctor/home"
-          element={
-            <PrivateRoute allowedRoles={["Doctor"]}>
-              <DoctorHome />
-            </PrivateRoute>
-          }
-        />
+        >
+          <Route index element={<DoctorHome />} />
+          <Route path="home" element={<DoctorHome />} />
+        </Route>
 
-        {/* Laboratory routes */}
+        {/* Laboratory */}
         <Route
           path="/lab"
           element={
@@ -86,34 +80,14 @@ function App() {
               <LabLayout />
             </PrivateRoute>
           }
-        />
-        <Route
-          path="/lab/home"
-          element={
-            <PrivateRoute allowedRoles={["Laboratory"]}>
-              <LabHome />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/lab/test-orders/:id"
-          element={
-            <PrivateRoute allowedRoles={["Laboratory"]}>
-              <TestOrderDetailsPage />
-            </PrivateRoute>
-          }
-        />
+        >
+          <Route index element={<LabHome />} />
+          <Route path="home" element={<LabHome />} />
+          <Route path="test-orders/:id" element={<TestOrderDetailsPage />} />
+          <Route path="test/:id" element={<LabTestDetailsPage />} />
+        </Route>
 
-        <Route
-          path="/lab/test/:id"
-          element={
-            <PrivateRoute allowedRoles={["Laboratory"]}>
-              <LabTestDetailsPage />
-            </PrivateRoute>
-          }
-        />
-
-        {/* Patient routes */}
+        {/* Patient */}
         <Route
           path="/patient"
           element={
@@ -130,8 +104,15 @@ function App() {
           <Route path="reports" element={<PatientReportsPage />} />
         </Route>
 
-        {/* Optional: unauthorized fallback */}
-        <Route path="/unauthorized" element={<div className="p-8 text-red-600 font-bold">Access denied</div>} />
+        {/* Unauthorized */}
+        <Route
+          path="/unauthorized"
+          element={
+            <div className="p-8 text-red-600 font-bold">
+              Access denied
+            </div>
+          }
+        />
       </Routes>
     </AuthProvider>
   );
