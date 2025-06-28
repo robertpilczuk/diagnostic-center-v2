@@ -10,6 +10,11 @@ interface TestOrder {
     patient_pesel: string;
 }
 
+interface Sample {
+    id: number;
+    collected_at: string;
+}
+
 interface TestResultFormData {
     description: string;
     pdf: File | null;
@@ -19,40 +24,53 @@ interface TestResultFormData {
 const TestOrderDetailsPage = () => {
     const { id } = useParams();
     const [order, setOrder] = useState<TestOrder | null>(null);
-    const [sampleId, setSampleId] = useState<number | null>(null);
+    const [samples, setSamples] = useState<Sample[]>([]);
     const [formData, setFormData] = useState<TestResultFormData>({
         description: "",
         pdf: null,
         sample_id: null,
     });
-    const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const [message, setMessage] = useState("");
+    const [addingSample, setAddingSample] = useState(false);
 
     useEffect(() => {
-        const fetchOrder = async () => {
+        const fetchAll = async () => {
             try {
-                const response = await api.get(`/lab/test-orders/${id}/`);
-                setOrder(response.data);
-            } catch {
-                setError("Failed to fetch order details");
-            }
-        };
-
-        const fetchSample = async () => {
-            try {
-                const response = await api.get(`/samples/?test_order=${id}`);
-                if (response.data.length > 0) {
-                    setSampleId(response.data[0].id);
-                    setFormData((prev) => ({ ...prev, sample_id: response.data[0].id }));
+                const [orderRes, samplesRes] = await Promise.all([
+                    api.get(`/lab/test-orders/${id}/`),
+                    api.get(`/lab/samples/?test_order=${id}`)
+                ]);
+                setOrder(orderRes.data);
+                setSamples(samplesRes.data);
+                if (samplesRes.data.length > 0) {
+                    setFormData((prev) => ({ ...prev, sample_id: samplesRes.data[0].id }));
                 }
             } catch (err) {
-                console.error("Failed to fetch sample:", err);
+                console.error("❌ Failed to fetch order or samples:", err);
+            } finally {
+                setLoading(false);
             }
         };
 
-        Promise.all([fetchOrder(), fetchSample()]).finally(() => setLoading(false));
+        fetchAll();
     }, [id]);
+
+    const handleAddSample = async () => {
+        setAddingSample(true);
+        try {
+            await api.post("/lab/samples/", { test_order: id });
+            const res = await api.get(`/lab/samples/?test_order=${id}`);
+            setSamples(res.data);
+            if (res.data.length > 0) {
+                setFormData((prev) => ({ ...prev, sample_id: res.data[0].id }));
+            }
+        } catch (err) {
+            console.error("❌ Failed to add sample:", err);
+        } finally {
+            setAddingSample(false);
+        }
+    };
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -78,29 +96,55 @@ const TestOrderDetailsPage = () => {
         data.append("sample", String(formData.sample_id));
 
         try {
-            await api.post("/test-results/", data, {
+            await api.post("/lab/test-results/", data, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
-            setMessage("Result submitted successfully.");
-        } catch {
-            setMessage("Failed to submit result.");
+            setMessage("✅ Result submitted successfully.");
+        } catch (err) {
+            console.error("❌ Failed to submit result:", err);
+            setMessage("❌ Failed to submit result.");
         }
     };
 
-    if (loading) return <div className="p-6">Loading...</div>;
-    if (error) return <div className="p-6 text-red-500">{error}</div>;
-    if (!order) return <div className="p-6">No data found.</div>;
+    if (loading) return <div className="p-8 text-blue-600 font-semibold">Loading...</div>;
 
     return (
-        <div className="p-6 max-w-xl mx-auto bg-white shadow-xl rounded-xl space-y-4">
-            <h1 className="text-2xl font-bold">Test Order Details</h1>
-            <p><strong>Test:</strong> {order.test_name}</p>
-            <p><strong>Ordered at:</strong> {new Date(order.ordered_at).toLocaleString()}</p>
-            <p><strong>Patient:</strong> {order.patient_username} (PESEL: {order.patient_pesel})</p>
+        <div className="p-8 max-w-3xl mx-auto space-y-6">
+            <h1 className="text-3xl font-bold">Test Order Details</h1>
+            {order && (
+                <div className="space-y-1">
+                    <div><strong>Test:</strong> {order.test_name}</div>
+                    <div><strong>Ordered at:</strong> {new Date(order.ordered_at).toLocaleString()}</div>
+                    <div><strong>Patient:</strong> {order.patient_username} (PESEL: {order.patient_pesel})</div>
+                </div>
+            )}
 
-            {sampleId ? (
-                <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-                    <h2 className="text-lg font-semibold">Add Test Result</h2>
+            <h2 className="text-xl font-semibold mt-4">Samples</h2>
+            {samples.length === 0 ? (
+                <div className="text-gray-500">
+                    No samples yet.
+                    <button
+                        onClick={handleAddSample}
+                        disabled={addingSample}
+                        className="ml-4 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                    >
+                        {addingSample ? "Adding..." : "Add Sample"}
+                    </button>
+                </div>
+            ) : (
+                <ul className="space-y-2">
+                    {samples.map(s => (
+                        <li key={s.id} className="p-3 bg-white rounded shadow">
+                            <strong>Sample ID:</strong> {s.id} <br />
+                            <strong>Collected:</strong> {new Date(s.collected_at).toLocaleString()}
+                        </li>
+                    ))}
+                </ul>
+            )}
+
+            {samples.length > 0 && (
+                <form onSubmit={handleSubmit} className="space-y-4 border-t pt-4">
+                    <h3 className="text-lg font-semibold">Submit Test Result</h3>
                     <textarea
                         name="description"
                         placeholder="Result description"
@@ -115,14 +159,14 @@ const TestOrderDetailsPage = () => {
                         className="block"
                         required
                     />
-                    <p className="text-sm text-gray-600">Sample ID: <strong>{sampleId}</strong></p>
-                    <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    <p className="text-sm text-gray-600">
+                        Saving for Sample ID: <strong>{formData.sample_id}</strong>
+                    </p>
+                    <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
                         Submit Result
                     </button>
                     {message && <p className="text-sm mt-2">{message}</p>}
                 </form>
-            ) : (
-                <p className="text-gray-500 mt-4">No sample registered yet for this order.</p>
             )}
         </div>
     );
