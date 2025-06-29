@@ -5,9 +5,17 @@ from patient.models import Patient
 
 
 class PrescriptionSerializer(serializers.ModelSerializer):
+    issued_by = serializers.SerializerMethodField()
+
     class Meta:
         model = Prescription
-        fields = "__all__"
+        fields = ["id", "medication", "issued_by", "issued_at"]
+
+    def get_issued_by(self, obj):
+        try:
+            return obj.doctor.user.username
+        except AttributeError:
+            return "Unknown doctor"
 
 
 class TestResultSerializer(serializers.ModelSerializer):

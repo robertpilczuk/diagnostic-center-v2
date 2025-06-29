@@ -1,54 +1,47 @@
-﻿from rest_framework.views import APIView
-from rest_framework.response import Response
+﻿from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import ListAPIView
-from rest_framework.filters import SearchFilter
-from .serializers import PatientTestResultSerializer
-
 from .serializers import (
     PrescriptionSerializer,
     TestResultSerializer,
-    PatientListSerializer,
+    PatientTestResultSerializer,
 )
-
-from doctor.models import Prescription
 from laboratory.models import TestResult
-from patient.models import Patient
+from doctor.models import Prescription
 
 
-class PrescriptionListView(APIView):
+class PatientTestListView(ListAPIView):
+    serializer_class = PatientTestResultSerializer
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        prescriptions = Prescription.objects.filter(patient__user=request.user)
-        serializer = PrescriptionSerializer(prescriptions, many=True)
-        return Response(serializer.data)
-
-
-class TestResultListView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        results = TestResult.objects.filter(
-            sample__test_order__patient__user=request.user
+    def get_queryset(self):
+        return TestResult.objects.filter(
+            sample__test_order__patient=self.request.user.patient
         )
-        serializer = TestResultSerializer(results, many=True)
-        return Response(serializer.data)
 
 
-class PatientTestListView(APIView):
+class PatientTestDetailView(RetrieveAPIView):
+    serializer_class = PatientTestResultSerializer
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        patient = request.user.patient
-        results = TestResult.objects.filter(sample__test_order__patient=patient)
-        serializer = PatientTestResultSerializer(results, many=True)
-        return Response(serializer.data)
+    def get_queryset(self):
+        return TestResult.objects.filter(
+            sample__test_order__patient=self.request.user.patient
+        )
 
 
-# class PatientSearchView(ListAPIView):
-#     queryset = Patient.objects.select_related("user").all()
-#     serializer_class = PatientListSerializer
-#     permission_classes = [IsAuthenticated]
-#     filter_backends = [SearchFilter]
-#     search_fields = ["user__username", "pesel"]
+class PrescriptionListView(ListAPIView):
+    serializer_class = PrescriptionSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Prescription.objects.filter(patient=self.request.user.patient)
+
+
+class TestResultListView(ListAPIView):
+    serializer_class = TestResultSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return TestResult.objects.filter(
+            sample__test_order__patient=self.request.user.patient
+        )
